@@ -32,19 +32,28 @@ const updateText = () => {
   rText = rEditor.getValue();
 };
 
+// URL Hash Format
+// Left Editor | Right Editor
+// Ex: abc|def
 const render = () => {
-  if (lEditor.getValue() != '' || rEditor.getValue() != '') {
-    const leftCompressed = lzutf8.compress(lEditor.getValue(), {outputEncoding: 'Base64'});
-    const rightCompressed = lzutf8.compress(rEditor.getValue(), {outputEncoding: 'Base64'});
-    window.location.hash = `${leftCompressed}|${rightCompressed}`;
-  } else if (window.location.hash != '') {
-    const [lCompressed, rCompressed] = window.location.hash.split('#')[1].split('|');
-    console.log(`left = ${lCompressed} | right = ${rCompressed}`);
-    const lDecompressed = lzutf8.decompress(lCompressed, {inputEncoding: 'Base64'});
-    const rDecompressed = lzutf8.decompress(rCompressed, {inputEncoding: 'Base64'});
-    lEditor.setValue(lDecompressed);
-    rEditor.setValue(rDecompressed);
-    updateText();
+  try {
+    // Save the current data into the URL hash
+    if (lEditor.getValue() != '' || rEditor.getValue() != '') {
+      const leftCompressed = lzutf8.compress(lEditor.getValue(), {outputEncoding: 'Base64'});
+      const rightCompressed = lzutf8.compress(rEditor.getValue(), {outputEncoding: 'Base64'});
+      window.location.hash = `${leftCompressed}|${rightCompressed}`;
+    } else if (window.location.hash != '') {
+      // Load the data from the URL hash
+      const [lCompressed, rCompressed] = window.location.hash.split('#')[1].split('|');
+      const lDecompressed = lzutf8.decompress(lCompressed, {inputEncoding: 'Base64'});
+      const rDecompressed = lzutf8.decompress(rCompressed, {inputEncoding: 'Base64'});
+      lEditor.setValue(lDecompressed);
+      rEditor.setValue(rDecompressed);
+      updateText();
+    }
+  } catch (error) {
+    console.log('Error occurred when load/unloading data. Resetting URL hash');
+    window.location.hash = '';
   }
   
   new Diff2Html.Diff2HtmlUI(elemDiff,
