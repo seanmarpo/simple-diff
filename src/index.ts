@@ -44,7 +44,7 @@ const render = () => {
       window.location.hash = `${leftCompressed}|${rightCompressed}`;
     } else if (window.location.hash != '') {
       // Load the data from the URL hash
-      const [lCompressed, rCompressed] = window.location.hash.split('#')[1].split('|');
+      const [lCompressed, rCompressed] = decodeURI(window.location.hash).split('#')[1].split('|');
       const lDecompressed = lzutf8.decompress(lCompressed, {inputEncoding: 'Base64'});
       const rDecompressed = lzutf8.decompress(rCompressed, {inputEncoding: 'Base64'});
       lEditor.setValue(lDecompressed);
